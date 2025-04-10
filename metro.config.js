@@ -1,11 +1,16 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const path = require('path');
 
-/**
- * Metro configuration
- * https://reactnative.dev/docs/metro
- *
- * @type {import('@react-native/metro-config').MetroConfig}
- */
-const config = {};
+module.exports = (async () => {
+  const defaultConfig = await getDefaultConfig(__dirname);
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+  return mergeConfig(defaultConfig, {
+    transformer: {
+      babelTransformerPath: path.resolve(__dirname, 'csv-transformer/index.js'), // 👉 직접 만든 transformer 사용
+    },
+    resolver: {
+      assetExts: defaultConfig.resolver.assetExts.filter(ext => ext !== 'csv'),
+      sourceExts: [...defaultConfig.resolver.sourceExts, 'csv'],
+    },
+  });
+})();
